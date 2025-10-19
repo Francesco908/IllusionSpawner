@@ -1,1 +1,265 @@
+-- =============================================================
+-- Illusion Hub - SPAWNER SEMPLICE (DA ZERO)
+-- =============================================================
 
+-- Services
+local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local HttpService = game:GetService("HttpService")
+
+local player = Players.LocalPlayer
+local playerGui = player:WaitForChild("PlayerGui")
+
+-- Funzione per trovare il plot del giocatore
+local function FindPlayerPlot()
+    local plots = workspace:FindFirstChild("Plots")
+    if not plots then return nil end
+    
+    for _, plot in pairs(plots:GetChildren()) do
+        local sign = plot:FindFirstChild("PlotSign")
+        if sign then
+            local yourBase = sign:FindFirstChild("YourBase")
+            if yourBase and yourBase.Enabled then
+                return plot
+            end
+        end
+    end
+    return nil
+end
+
+-- Funzione per trovare il RemoteEvent del plot
+local function FindPlotRemote(plotName)
+    local path = ReplicatedStorage:FindFirstChild("Packages")
+    if path then
+        path = path:FindFirstChild("Synchronizer")
+        if path then
+            path = path:FindFirstChild("Channel")
+            if path then
+                local remote = path:FindFirstChild(plotName)
+                if remote and remote:IsA("RemoteEvent") then
+                    return remote
+                end
+            end
+        end
+    end
+    return nil
+end
+
+-- Creazione GUI
+local screenGui = Instance.new("ScreenGui")
+screenGui.Name = "IllusionHub"
+screenGui.ResetOnSpawn = false
+screenGui.Parent = playerGui
+
+-- Main Frame
+local mainFrame = Instance.new("Frame")
+mainFrame.Size = UDim2.new(0, 320, 0, 250)
+mainFrame.Position = UDim2.new(0.5, -160, 0.5, -125)
+mainFrame.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
+mainFrame.BorderSizePixel = 0
+mainFrame.Active = true
+mainFrame.Draggable = true
+mainFrame.Parent = screenGui
+
+local mainCorner = Instance.new("UICorner")
+mainCorner.CornerRadius = UDim.new(0, 15)
+mainCorner.Parent = mainFrame
+
+local border = Instance.new("UIStroke")
+border.Color = Color3.fromRGB(120, 120, 120)
+border.Thickness = 3
+border.Parent = mainFrame
+
+-- Title
+local title = Instance.new("TextLabel")
+title.Size = UDim2.new(1, 0, 0, 45)
+title.BackgroundTransparency = 1
+title.Font = Enum.Font.GothamBold
+title.TextSize = 22
+title.TextColor3 = Color3.fromRGB(255, 255, 255)
+title.Text = "Illusion Hub - Spawner"
+title.Parent = mainFrame
+
+-- First Brainrot Label
+local label1 = Instance.new("TextLabel")
+label1.Size = UDim2.new(1, -20, 0, 18)
+label1.Position = UDim2.new(0, 10, 0, 52)
+label1.BackgroundTransparency = 1
+label1.Font = Enum.Font.Gotham
+label1.TextSize = 13
+label1.TextColor3 = Color3.fromRGB(200, 200, 200)
+label1.Text = "Brainrot a Posizione 1:"
+label1.TextXAlignment = Enum.TextXAlignment.Left
+label1.Parent = mainFrame
+
+-- First Brainrot TextBox
+local brainrot1Box = Instance.new("TextBox")
+brainrot1Box.Size = UDim2.new(1, -20, 0, 32)
+brainrot1Box.Position = UDim2.new(0, 10, 0, 72)
+brainrot1Box.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+brainrot1Box.BorderSizePixel = 0
+brainrot1Box.Font = Enum.Font.Gotham
+brainrot1Box.TextSize = 14
+brainrot1Box.TextColor3 = Color3.fromRGB(255, 255, 255)
+brainrot1Box.PlaceholderText = "Es: Strawberry Elephant"
+brainrot1Box.Text = ""
+brainrot1Box.Parent = mainFrame
+
+local corner1 = Instance.new("UICorner")
+corner1.CornerRadius = UDim.new(0, 8)
+corner1.Parent = brainrot1Box
+
+-- Second Brainrot Label
+local label2 = Instance.new("TextLabel")
+label2.Size = UDim2.new(1, -20, 0, 18)
+label2.Position = UDim2.new(0, 10, 0, 112)
+label2.BackgroundTransparency = 1
+label2.Font = Enum.Font.Gotham
+label2.TextSize = 13
+label2.TextColor3 = Color3.fromRGB(200, 200, 200)
+label2.Text = "Brainrot a Posizione 2:"
+label2.TextXAlignment = Enum.TextXAlignment.Left
+label2.Parent = mainFrame
+
+-- Second Brainrot TextBox
+local brainrot2Box = Instance.new("TextBox")
+brainrot2Box.Size = UDim2.new(1, -20, 0, 32)
+brainrot2Box.Position = UDim2.new(0, 10, 0, 132)
+brainrot2Box.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+brainrot2Box.BorderSizePixel = 0
+brainrot2Box.Font = Enum.Font.Gotham
+brainrot2Box.TextSize = 14
+brainrot2Box.TextColor3 = Color3.fromRGB(255, 255, 255)
+brainrot2Box.PlaceholderText = "Es: Noobini Pizzanini"
+brainrot2Box.Text = ""
+brainrot2Box.Parent = mainFrame
+
+local corner2 = Instance.new("UICorner")
+corner2.CornerRadius = UDim.new(0, 8)
+corner2.Parent = brainrot2Box
+
+-- Status Label
+local statusLabel = Instance.new("TextLabel")
+statusLabel.Size = UDim2.new(1, -20, 0, 28)
+statusLabel.Position = UDim2.new(0, 10, 0, 175)
+statusLabel.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+statusLabel.BorderSizePixel = 0
+statusLabel.Font = Enum.Font.GothamBold
+statusLabel.TextSize = 13
+statusLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+statusLabel.Text = "Pronto"
+statusLabel.Parent = mainFrame
+
+local cornerBg = Instance.new("UICorner")
+cornerBg.CornerRadius = UDim.new(0, 8)
+cornerBg.Parent = statusLabel
+
+-- Start Button
+local startBtn = Instance.new("TextButton")
+startBtn.Size = UDim2.new(1, -20, 0, 32)
+startBtn.Position = UDim2.new(0, 10, 0, 210)
+startBtn.BackgroundColor3 = Color3.fromRGB(60, 120, 255)
+startBtn.BorderSizePixel = 0
+startBtn.Font = Enum.Font.GothamBold
+startBtn.TextSize = 15
+startBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+startBtn.Text = "SPAWN"
+startBtn.Parent = mainFrame
+
+local cornerBtn = Instance.new("UICorner")
+cornerBtn.CornerRadius = UDim.new(0, 8)
+cornerBtn.Parent = startBtn
+
+-- Funzione principale
+local function executeSpawn()
+    local brainrot1Name = brainrot1Box.Text
+    local brainrot2Name = brainrot2Box.Text
+    
+    if brainrot1Name == "" and brainrot2Name == "" then
+        statusLabel.Text = "⚠️ Inserisci almeno un nome!"
+        wait(2)
+        statusLabel.Text = "Pronto"
+        return
+    end
+    
+    statusLabel.Text = "Trovando plot..."
+    
+    local plot = FindPlayerPlot()
+    if not plot then
+        statusLabel.Text = "❌ Plot non trovato!"
+        wait(2)
+        statusLabel.Text = "Pronto"
+        return
+    end
+    
+    statusLabel.Text = "Trovando remote..."
+    
+    local remote = FindPlotRemote(plot.Name)
+    if not remote then
+        statusLabel.Text = "❌ Remote non trovato!"
+        wait(2)
+        statusLabel.Text = "Pronto"
+        return
+    end
+    
+    statusLabel.Text = "✨ Spawning..."
+    
+    -- Crea OLD data (TUTTO VUOTO)
+    local oldData = {}
+    for i = 1, 18 do
+        oldData[i] = "Empty"
+    end
+    
+    -- Crea NEW data (con i nostri brainrot)
+    local newData = {}
+    for i = 1, 18 do
+        newData[i] = "Empty"
+    end
+    
+    if brainrot1Name ~= "" then
+        newData[1] = {
+            UUID = "adf2cbb1-bf95-43f9-bd36-dee943f4aae4", -- UUID fisso
+            Traits = {},
+            Index = brainrot1Name,
+            Mutation = "",
+            Steal = false,
+            LastCollect = os.time()
+        }
+    end
+    
+    if brainrot2Name ~= "" then
+        newData[2] = {
+            UUID = "12686ae1-173a-447a-9088-234777f8a08f", -- Altro UUID fisso
+            Traits = {},
+            Index = brainrot2Name,
+            Mutation = "",
+            Steal = false,
+            LastCollect = os.time()
+        }
+    end
+
+    -- Manda il segnale
+    local success, err = pcall(function()
+        firesignal(remote.OnClientEvent, {
+            {
+                "AnimalList",
+                "Changed",
+                oldData,
+                newData
+            }
+        })
+    end)
+    
+    if success then
+        statusLabel.Text = "✅ Segnale inviato!"
+    else
+        statusLabel.Text = "❌ Errore nell'invio"
+    end
+    
+    wait(2)
+    statusLabel.Text = "Pronto"
+end
+
+startBtn.MouseButton1Click:Connect(executeSpawn)
+
+print("✨ Illusion Hub Spawner Semplice caricato!")
